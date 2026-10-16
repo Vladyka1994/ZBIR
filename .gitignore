@@ -1,7 +1,20 @@
+# Залежності й збірка
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Секрети
+.env
+.env.*
+
+# Службові прапорці Claude
 .claude/.byyou-*
 .claude/.token-halt
 .claude/.byyou-release
 .claude/hooks/.byyou-handoff-warned
-node_modules/
-.env
-.env.*
+
+# Різне
+.DS_Store
+*.log

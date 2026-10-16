@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/* Дизайн-токени (кольори в одному місці). У компонентах — тільки через них, не hex. */
+:root {
+  --bg: #f5f6f2;
+  --surface: #ffffff;
+  --surface-2: #eef1ea;
+  --text: #17201a;
+  --muted: #5f6b62;
+  --line: rgba(20, 40, 20, 0.1);
+  --accent: #1f7a3f;
+  --accent-strong: #17602f;
+  --accent-soft: #e3f1e7;
+  --on-accent: #ffffff;
+  --orange: #c2410c;
+  --orange-soft: #fdeee4;
+  --on-orange: #ffffff;
+  --glass: rgba(245, 246, 242, 0.8);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px -12px rgba(20, 50, 25, 0.18);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-orange: var(--orange);
+  --color-orange-soft: var(--orange-soft);
+  --color-on-orange: var(--on-orange);
+  --color-glass: var(--glass);
+  --shadow-card: var(--shadow);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, Roboto, Arial, sans-serif;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Ілюстрація рослини (замість фото, поки нема справжніх): фон і колір від відтінку --h */
+.herb-art {
+  background:
+    radial-gradient(120% 90% at 85% 10%, hsl(var(--h) 60% 96%) 0%, transparent 60%),
+    linear-gradient(160deg, hsl(var(--h) 42% 91%), hsl(var(--h) 36% 82%));
+  color: hsl(var(--h) 38% 30%);
+}
+
+/* Натискання — легке стискання, як на iOS */
+.pressable {
+  transition: transform 0.18s var(--ease-out-soft), background-color 0.2s ease;
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+.sheet-up {
+  animation: sheet-up 0.32s var(--ease-out-soft) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

@@ -14,10 +14,23 @@
 ## Коротко про проєкт
 **ZBIR** («Збір») — маркетплейс лікарської сировини: збирачі продають, закупівельники публікують заявки, аукціони партій.
 - **Власник:** Влад (GitHub `vladyka1994`).
-- **Стек:** {{STACK}}
-- **Деплой:** {{DEPLOY}} (автоматично при мерджі в `main`)
+- **Стек:** Next.js 16 (статичний експорт `output: export`) + Tailwind 4 + TypeScript; бази поки нема (далі — Supabase)
+- **Деплой:** GitHub Actions → GitHub Pages (`.github/workflows/deploy.yml`, автоматично при мерджі в `main`)
 - **URL (ціль):** https://vladyka1994.github.io/ZBIR/ — у кінці видати Владу перевірене посилання.
 - **Старий прототип:** `Volodymyr221/LikarskyTravy-Market` (довідка).
+
+## Карта коду
+| шлях | що |
+|---|---|
+| `src/app/` | сторінки: `/` (стрічка), `ogoloshennia/[id]` (оголошення), `tsiny` (ціни тижня), `podaty` (форма), `profil` (вхід) |
+| `src/components/` | `Chrome` (шапка, нижнє меню, SW), `Feed` (пошук/категорії/Продам-Куплю/фільтр), `ListingCard`, `CallButton`, `PricesStrip`, `HerbArt` (ілюстрації — з прототипу Вови), `Icon` |
+| `src/data/` | приклади: `listings`, довідник `herbs`, `regions` |
+| `src/lib/brand.ts` | назва бренду, `basePath`, прапорець `DEMO` |
+| `src/app/globals.css` | дизайн-токени (кольори) |
+| `public/sw.js` | service worker, `CACHE_NAME` піднімає CI |
+
+Команди: `npm test` (перевірка типів), `NEXT_PUBLIC_BASE_PATH=/ZBIR npm run build` (збірка як на Pages).
+Next.js 16: перед кодом читай `node_modules/next/dist/docs/` (`params` — Promise).
 
 ## Гілки
 - Робоча: `claude/<тема>` — уся розробка.
