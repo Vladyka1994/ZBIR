@@ -52,10 +52,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 8px;
+/* У базовому шарі — щоб класи на кшталт focus-visible:outline-none могли це перекрити */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
 }
 
 /* Ілюстрація рослини (замість фото, поки нема справжніх): фон і колір від відтінку --h */
@@ -98,4 +101,11 @@ body {
 
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Свій хрестик «очистити» замість вбудованого в браузер (інакше їх два) */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  display: none;
 }

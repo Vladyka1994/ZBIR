@@ -23,8 +23,9 @@
 | шлях | що |
 |---|---|
 | `src/app/` | сторінки: `/` (стрічка), `ogoloshennia/[id]` (оголошення), `tsiny` (ціни тижня), `podaty` (форма), `profil` (вхід) |
-| `src/components/` | `Chrome` (шапка, нижнє меню, SW), `Feed` (пошук/категорії/Продам-Куплю/фільтр), `ListingCard`, `CallButton`, `PricesStrip`, `HerbArt` (ілюстрації — з прототипу Вови), `Icon` |
+| `src/components/` | `Chrome` (шапка, нижнє меню, SW), `Feed` (категорії/Продам-Куплю/фільтр), `SearchBox` (рядок пошуку з підказками), `ListingCard`, `CallButton`, `PricesStrip`, `HerbArt` (ілюстрації — з прототипу Вови), `Icon` |
 | `src/data/` | приклади: `listings`, довідник `herbs`, `regions` |
+| `src/lib/search.ts` | розумний пошук: помилки, апострофи, народні назви, категорії — **одне місце правди** |
 | `src/lib/brand.ts` | назва бренду, `basePath`, прапорець `DEMO` |
 | `src/app/globals.css` | дизайн-токени (кольори) |
 | `public/sw.js` | service worker, `CACHE_NAME` піднімає CI |

@@ -1,7 +1,7 @@
 # NOW — пульс ZBIR
 
 <!-- AUTO:BEGIN — генерується scripts/now_update.mjs з git, руками не правити -->
-гілка: claude/new-repo-skills-rules-6xfoaa · останній PR: #2 (squash) · деплой: run #2 ✅ · не в main: —
+гілка: claude/new-repo-skills-rules-6xfoaa · останній PR: #3 (squash) · деплой: run #3 ✅ · не в main: —
 <!-- AUTO:END -->
 
 ## 🎯 ЗАРАЗ

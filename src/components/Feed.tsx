@@ -3,10 +3,11 @@
 import { useMemo, useState } from "react";
 import { Icon } from "./Icon";
 import { ListingCard } from "./ListingCard";
+import { SearchBox } from "./SearchBox";
 import { categories, herbById, type CategoryId } from "@/data/herbs";
 import { listings } from "@/data/listings";
 import { regions } from "@/data/regions";
-import { searchKey } from "@/lib/format";
+import { matchHerbs, norm } from "@/lib/search";
 
 type Sort = "new" | "cheap" | "expensive";
 
@@ -19,13 +20,14 @@ export function Feed() {
   const [sheet, setSheet] = useState(false);
 
   const shown = useMemo(() => {
-    const needle = searchKey(q);
+    const needle = norm(q);
+    const herbIds = new Set(matchHerbs(q).map((h) => h.id));
     const out = listings.filter((l) => {
       const herb = herbById(l.herbId);
       return l.kind === kind
         && (!cat || herb.category === cat)
         && (!region || l.region === region)
-        && (!needle || searchKey(herb.name).includes(needle) || searchKey(l.note).includes(needle));
+        && (!needle || herbIds.has(l.herbId) || norm(l.note).includes(needle));
     });
     if (sort === "cheap") out.sort((a, b) => a.price - b.price);
     if (sort === "expensive") out.sort((a, b) => b.price - a.price);
@@ -37,13 +39,7 @@ export function Feed() {
 
   return (
     <section className="mx-auto max-w-5xl px-4">
-      <label className="flex h-12 items-center gap-2 rounded-2xl border border-line bg-surface px-4 shadow-card">
-        <Icon name="search" size={20} className="text-muted" />
-        <span className="sr-only">Пошук</span>
-        <input value={q} onChange={(e) => setQ(e.target.value)} type="search" placeholder="Яку рослину шукаєте?"
-          className="h-full min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-muted" />
-        {q && <button type="button" onClick={() => setQ("")} aria-label="Очистити пошук" className="text-muted"><Icon name="x" size={18} /></button>}
-      </label>
+      <SearchBox value={q} onChange={setQ} />
 
       <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4">
         {categories.map((c) => {
