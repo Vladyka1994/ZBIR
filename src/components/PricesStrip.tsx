@@ -1,6 +1,6 @@
 // Міні-блок «Ціни тижня» на головній — гачок, щоб збирачі заходили щотижня.
 import Link from "next/link";
-import { herbs } from "@/data/herbs";
+import { dryWord, herbs } from "@/data/herbs";
 import { uah } from "@/lib/format";
 
 const top = ["air-root", "chamomile", "rosehip", "linden"];
@@ -19,7 +19,7 @@ export function PricesStrip() {
             <Link key={id} href="/tsiny/" className="pressable w-40 shrink-0 rounded-2xl border border-line bg-surface p-3 shadow-card">
               <p className="truncate text-[14px] text-muted">{h.name}</p>
               <p className="mt-1 text-[17px] font-bold">{h.priceHint[0]}–{uah(h.priceHint[1])}</p>
-              <p className="text-[12px] text-muted">за кг, суха</p>
+              <p className="text-[12px] text-muted">{dryWord(h)}, за 1 кг</p>
             </Link>
           );
         })}

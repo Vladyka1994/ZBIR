@@ -1,13 +1,14 @@
 # NOW — пульс ZBIR
 
 <!-- AUTO:BEGIN — генерується scripts/now_update.mjs з git, руками не правити -->
-гілка: claude/new-repo-skills-rules-6xfoaa · останній PR: — · не в main: розгортання кіта
+гілка: claude/new-repo-skills-rules-6xfoaa · останній PR: #1 (squash) · деплой: run #1 ✅ · не в main: —
 <!-- AUTO:END -->
 
 ## 🎯 ЗАРАЗ
 Новий репозиторій. Розгорнуто робоче середовище з `VOVA_CLAUDE_KIT.md` (правила, команди, хуки, скіли). Проєкт передано від Вови Владу (новачок — пояснювати просто). Старий прототип прочитано (`Volodymyr221/LikarskyTravy-Market`). Ціль — робочий сайт https://vladyka1994.github.io/ZBIR/.
 
 ## ✅ ЗРОБЛЕНО В ОСТАННІЙ СЕСІЇ (16.10.2026)
+- 🌐 ОПУБЛІКОВАНО: https://vladyka1994.github.io/ZBIR/ (PR #1 → main, деплой run #1: build ✅ deploy ✅). Pages увімкнув Влад. З хмари Claude github.io закритий — живий сайт перевіряє Влад.
 - `CLAUDE.md`, `docs/` (NOW, HOT_RULES, OWNER_PROFILE, NEVYKONANI_ZAVDANNIA, KURS, BUGS, SESSION_STATE, BYYOU_PLAN, MARKETING_PLAYBOOK).
 - 21 команда в `.claude/commands/` + `fullaudit` в `commands-archived/`.
 - Хуки + `.claude/settings.json`; скіли: caveman, vibe-audit, ui-ux-pro-max, 7 анімаційних (`.agents/skills/`, симлінки в `.claude/skills/`).
@@ -26,7 +27,9 @@
 - Профіль власника `docs/OWNER_PROFILE.md` — заповнити.
 
 ## ➡️ ДАЛІ
-1. Влад: увімкнути GitHub Pages (Settings → Pages → Source: GitHub Actions) і сказати «публікуй» → PR → main → https://vladyka1994.github.io/ZBIR/
+1. Влад дивиться опублікований прототип з телефона → правки.
+2. База даних (Supabase): справжні оголошення, вхід за телефоном.
+3. Справжні фото від збирачів і ціни від закупівельників.
 2. 2–3 варіанти стеку з плюсами/мінусами + ASCII-макет головного екрана.
 3. Після «Роби» — підставити плейсхолдери, створити каркас.
 
