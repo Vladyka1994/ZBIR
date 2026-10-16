@@ -6,6 +6,7 @@ import { ListingCard } from "./ListingCard";
 import { categories, herbById, type CategoryId } from "@/data/herbs";
 import { listings } from "@/data/listings";
 import { regions } from "@/data/regions";
+import { searchKey } from "@/lib/format";
 
 type Sort = "new" | "cheap" | "expensive";
 
@@ -18,13 +19,13 @@ export function Feed() {
   const [sheet, setSheet] = useState(false);
 
   const shown = useMemo(() => {
-    const needle = q.trim().toLowerCase();
+    const needle = searchKey(q);
     const out = listings.filter((l) => {
       const herb = herbById(l.herbId);
       return l.kind === kind
         && (!cat || herb.category === cat)
         && (!region || l.region === region)
-        && (!needle || herb.name.toLowerCase().includes(needle) || l.note.toLowerCase().includes(needle));
+        && (!needle || searchKey(herb.name).includes(needle) || searchKey(l.note).includes(needle));
     });
     if (sort === "cheap") out.sort((a, b) => a.price - b.price);
     if (sort === "expensive") out.sort((a, b) => b.price - a.price);
