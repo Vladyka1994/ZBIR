@@ -1,7 +1,7 @@
 // «Ціни тижня» — скільки зараз платять за кг сухої сировини.
 import type { Metadata } from "next";
 import { HerbArt } from "@/components/HerbArt";
-import { herbs } from "@/data/herbs";
+import { dryWord, herbs } from "@/data/herbs";
 import { uah } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Ціни тижня" };
@@ -23,7 +23,7 @@ export default function Prices() {
               <p className="truncate font-semibold">{h.name}</p>
               <p className="text-[13px] text-muted">{h.part}</p>
             </div>
-            <p className="shrink-0 text-right font-bold">{h.priceHint[0]}–{uah(h.priceHint[1])}<span className="block text-[12px] font-normal text-muted">за кг</span></p>
+            <p className="shrink-0 text-right font-bold">{h.priceHint[0]}–{uah(h.priceHint[1])}<span className="block text-[12px] font-normal text-muted">{dryWord(h)}, за 1 кг</span></p>
           </li>
         ))}
       </ul>
