@@ -1,31 +1,16 @@
 // Розумний пошук рослин: розуміє помилки («ромащка»), апострофи («мята»), народні назви («лепеха»)
 // і категорії («коріння» → усе коріння). Одне місце правди для підказок і фільтра стрічки.
-import { herbs, type CategoryId, type Herb } from "@/data/herbs";
-
-/** Народні, суржикові й російські назви — так люди реально пишуть. */
-const aliases: Record<string, string[]> = {
-  "air-root": ["аїр", "лепеха", "татарське зілля", "аир"],
-  "nettle-root": ["кропива", "жалива"],
-  "nettle-leaf": ["кропива", "жалива"],
-  linden: ["липа", "липа цвіт"],
-  chamomile: ["ромашка аптечна", "ромашка"],
-  hypericum: ["заяча кров", "звіробой"],
-  rosehip: ["дика рожа", "собача рожа", "шиповник"],
-  "dandelion-root": ["кульбаба", "одуванчик"],
-  elderflower: ["бузина", "бузина чорна"],
-  mint: ["мята", "мятка"],
-  "milk-thistle": ["розторопша", "чортополох"],
-  yarrow: ["тисячолистник", "кривавник"],
-};
+import { herbs, OTHER, type CategoryId, type Herb } from "@/data/herbs";
 
 /** Слова, якими люди називають частину рослини — знаходять усю категорію. */
 const categoryWords: Record<CategoryId, string[]> = {
   root: ["коріння", "корінь", "корені", "корінці"],
   leaf: ["листя", "лист", "листок"],
   flower: ["квіти", "квітки", "квітка", "цвіт"],
-  fruit: ["плоди", "плід", "ягоди"],
+  fruit: ["плоди", "плід", "ягоди", "ягода"],
   herb: ["трава", "трави"],
   seed: ["насіння"],
+  bark: ["кора", "бруньки"],
 };
 
 /** Малі літери, без апострофів (м'ята = мята), ґ → г, зайві пробіли геть. */
@@ -49,15 +34,16 @@ function dist(a: string, b: string) {
 function wordScore(q: string, t: string) {
   if (t === q) return 5;
   if (t.startsWith(q)) return 4;
-  const allowed = q.length >= 7 ? 2 : q.length >= 4 ? 1 : 0; // короткі слова — без «вгадування»
+  if (t.length >= 3 && q.startsWith(t)) return 3; // слово з закінченням: «аира» → «аир», «кропиви» → «кропив…»
+  const allowed = q.length >= 8 ? 2 : q.length >= 5 ? 1 : 0; // короткі слова — без «вгадування» (інакше «кава» → «лаванда»)
   if (!allowed) return 0;
   const best = Math.min(dist(q, t), dist(q, t.slice(0, q.length)), dist(q, t.slice(0, q.length + 1)));
   return best <= allowed ? 3 - best : 0;
 }
 
-const terms = (h: Herb) => [h.name, h.part, ...(aliases[h.id] ?? []), ...categoryWords[h.category]].map((t) => norm(t).split(" "));
+const terms = (h: Herb) => [h.name, h.part, ...h.aliases, ...categoryWords[h.category]].map((t) => norm(t).split(" "));
 
-const index = herbs.map((h) => ({ herb: h, terms: terms(h) }));
+const index = herbs.filter((h) => h.id !== OTHER).map((h) => ({ herb: h, terms: terms(h) }));
 
 /** Рослини, що підходять під запит, від найкращої. Кожне слово запиту має щось знайти. */
 export function matchHerbs(query: string): Herb[] {

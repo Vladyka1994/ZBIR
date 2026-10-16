@@ -23,9 +23,12 @@
 | шлях | що |
 |---|---|
 | `src/app/` | сторінки: `/` (стрічка), `ogoloshennia/[id]` (оголошення), `tsiny` (ціни тижня), `podaty` (форма), `profil` (вхід) |
-| `src/components/` | `Chrome` (шапка, нижнє меню, SW), `Feed` (категорії/Продам-Куплю/фільтр), `SearchBox` (рядок пошуку з підказками), `ListingCard`, `CallButton`, `PricesStrip`, `HerbArt` (ілюстрації — з прототипу Вови), `Icon` |
-| `src/data/` | приклади: `listings`, довідник `herbs`, `regions` |
+| `src/components/` | `Chrome` (шапка, нижнє меню, SW), `Feed` (категорії/Продам-Куплю/фільтр), `SearchBox` (рядок пошуку з підказками), `ListingCard`, `ContactButtons` (Подзвонити/Viber/Telegram), `PricesStrip`, `HerbArt` (ілюстрації — з прототипу Вови), `Icon` |
+| `src/data/` | приклади `listings` (оголошення = кілька позицій `items`), довідник `herbs` (87 рослин + народні назви), `regions` |
 | `src/lib/search.ts` | розумний пошук: помилки, апострофи, народні назви, категорії — **одне місце правди** |
+| `src/lib/items.ts` | тексти оголошень: назва, ціна з одиницею, заголовок, умови |
+| `src/lib/rules.ts` | заборона отруйних грибів/рослин — **одне місце правди** |
+| `src/lib/format.ts` | гроші, одиниці ціни (кг / 100 г / л / шт) |
 | `src/lib/brand.ts` | назва бренду, `basePath`, прапорець `DEMO` |
 | `src/app/globals.css` | дизайн-токени (кольори) |
 | `public/sw.js` | service worker, `CACHE_NAME` піднімає CI |

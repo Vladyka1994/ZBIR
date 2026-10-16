@@ -7,7 +7,7 @@ import { uah } from "@/lib/format";
 export const metadata: Metadata = { title: "Ціни тижня" };
 
 export default function Prices() {
-  const sorted = [...herbs].sort((a, b) => a.name.localeCompare(b.name, "uk"));
+  const sorted = herbs.filter((h) => h.priceHint).sort((a, b) => a.name.localeCompare(b.name, "uk"));
   return (
     <div className="mx-auto max-w-2xl px-4 pt-5">
       <h1 className="text-[26px] font-bold">Ціни тижня</h1>
@@ -23,7 +23,7 @@ export default function Prices() {
               <p className="truncate font-semibold">{h.name}</p>
               <p className="text-[13px] text-muted">{h.part}</p>
             </div>
-            <p className="shrink-0 text-right font-bold">{h.priceHint[0]}–{uah(h.priceHint[1])}<span className="block text-[12px] font-normal text-muted">{dryWord(h)}, за 1 кг</span></p>
+            <p className="shrink-0 text-right font-bold">{h.priceHint![0]}–{uah(h.priceHint![1])}<span className="block text-[12px] font-normal text-muted">{dryWord(h)}, за 1 кг</span></p>
           </li>
         ))}
       </ul>

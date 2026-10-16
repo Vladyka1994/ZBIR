@@ -1,62 +1,143 @@
-// Довідник сировини: рослина → частина, сезон, ілюстрація. Одне місце правди для всіх розділів.
+// Довідник сировини: рослина → категорія, частина, ілюстрація, народні назви. Одне місце правди для всіх розділів.
+// Додати рослину — один рядок у списку `rows` нижче.
 
 export type ArtKind = "leaf" | "root" | "rhizome" | "flower" | "daisy" | "berry" | "umbel" | "seed";
 
 /** Категорії за частиною рослини — так людям простіше шукати («в мене коріння»). */
-export type CategoryId = "root" | "leaf" | "flower" | "fruit" | "herb" | "seed";
-export const categories: { id: CategoryId; name: string; icon: string }[] = [
-  { id: "root", name: "Коріння", icon: "air-root" },
-  { id: "leaf", name: "Листя", icon: "nettle-leaf" },
-  { id: "flower", name: "Квіти", icon: "chamomile" },
-  { id: "fruit", name: "Плоди", icon: "rosehip" },
-  { id: "herb", name: "Трава", icon: "yarrow" },
-  { id: "seed", name: "Насіння", icon: "milk-thistle" },
+export type CategoryId = "root" | "leaf" | "flower" | "fruit" | "herb" | "seed" | "bark";
+export const categories: { id: CategoryId; name: string }[] = [
+  { id: "root", name: "Коріння" },
+  { id: "leaf", name: "Листя" },
+  { id: "flower", name: "Квіти" },
+  { id: "fruit", name: "Плоди і ягоди" },
+  { id: "herb", name: "Трава" },
+  { id: "seed", name: "Насіння" },
+  { id: "bark", name: "Кора, бруньки" },
 ];
 
 export type Herb = {
   id: string;
   name: string;
-  latin: string;
+  category: CategoryId;
   part: string;
   art: ArtKind;
-  category: CategoryId;
   hue: number; // відтінок ілюстрації (HSL)
-  months: number[]; // місяці збору, 1–12
-  priceHint: [number, number]; // орієнтир ціни сухої сировини, грн/кг
-  gender: "m" | "f" | "n"; // рід назви — для узгодження слів («корінь сухий», «ромашка суха», «листя сухе»)
+  gender: "m" | "f" | "n" | "p"; // рід назви: «корінь сухий», «ромашка суха», «листя сухе», «пелюстки сухі»
+  aliases: string[]; // народні, суржикові, російські назви — так люди реально пишуть
+  priceHint?: [number, number]; // орієнтир ціни сухої сировини, грн/кг (поки приклад)
+  latin?: string;
   photo?: string; // справжнє фото — підставимо пізніше
 };
 
-export const herbs: Herb[] = [
-  { id: "air-root", category: "root", name: "Корінь аїру", latin: "Acorus calamus", part: "кореневище", art: "rhizome", hue: 34, months: [4, 9, 10], priceHint: [70, 95], gender: "m" },
-  { id: "nettle-root", category: "root", name: "Корінь кропиви", latin: "Urtica dioica", part: "корінь", art: "root", hue: 28, months: [3, 4, 9, 10], priceHint: [45, 70], gender: "m" },
-  { id: "nettle-leaf", category: "leaf", name: "Листя кропиви", latin: "Urtica dioica", part: "лист", art: "leaf", hue: 128, months: [5, 6, 7], priceHint: [28, 42], gender: "n" },
-  { id: "linden", category: "flower", name: "Липовий цвіт", latin: "Tilia cordata", part: "суцвіття", art: "flower", hue: 52, months: [6, 7], priceHint: [140, 210], gender: "m" },
-  { id: "chamomile", category: "flower", name: "Ромашка лікарська", latin: "Matricaria chamomilla", part: "квітки", art: "daisy", hue: 46, months: [5, 6, 7, 8], priceHint: [55, 80], gender: "f" },
-  { id: "hypericum", category: "herb", name: "Звіробій", latin: "Hypericum perforatum", part: "трава", art: "flower", hue: 42, months: [6, 7, 8], priceHint: [40, 60], gender: "m" },
-  { id: "rosehip", category: "fruit", name: "Шипшина", latin: "Rosa canina", part: "плоди", art: "berry", hue: 12, months: [9, 10], priceHint: [45, 65], gender: "f" },
-  { id: "dandelion-root", category: "root", name: "Корінь кульбаби", latin: "Taraxacum officinale", part: "корінь", art: "root", hue: 40, months: [4, 9, 10], priceHint: [60, 85], gender: "m" },
-  { id: "elderflower", category: "flower", name: "Цвіт бузини", latin: "Sambucus nigra", part: "суцвіття", art: "umbel", hue: 70, months: [5, 6], priceHint: [110, 160], gender: "m" },
-  { id: "mint", category: "leaf", name: "М'ята перцева", latin: "Mentha × piperita", part: "лист", art: "leaf", hue: 152, months: [6, 7, 8], priceHint: [60, 85], gender: "f" },
-  { id: "milk-thistle", category: "seed", name: "Насіння розторопші", latin: "Silybum marianum", part: "насіння", art: "seed", hue: 30, months: [8, 9], priceHint: [45, 70], gender: "n" },
-  { id: "yarrow", category: "herb", name: "Деревій", latin: "Achillea millefolium", part: "трава", art: "umbel", hue: 96, months: [6, 7, 8], priceHint: [30, 45], gender: "m" },
+type Row = [id: string, name: string, cat: CategoryId, part: string, art: ArtKind, hue: number, g: Herb["gender"], aliases: string[], price?: [number, number]];
+
+const rows: Row[] = [
+  // Коріння
+  ["air-root", "Корінь аїру", "root", "кореневище", "rhizome", 34, "m", ["аїр", "лепеха", "татарське зілля", "аир"], [70, 95]],
+  ["nettle-root", "Корінь кропиви", "root", "корінь", "root", 28, "m", ["кропива", "жалива"], [45, 70]],
+  ["dandelion-root", "Корінь кульбаби", "root", "корінь", "root", 40, "m", ["кульбаба", "одуванчик"], [60, 85]],
+  ["valerian-root", "Корінь валеріани", "root", "корінь", "root", 32, "m", ["валеріана", "валерьяна", "котячий корінь"]],
+  ["elecampane-root", "Корінь оману", "root", "корінь", "root", 30, "m", ["оман", "девясил"]],
+  ["burdock-root", "Корінь лопуха", "root", "корінь", "root", 26, "m", ["лопух", "реп'ях", "репейник"]],
+  ["chicory-root", "Корінь цикорію", "root", "корінь", "root", 36, "m", ["цикорій", "цикорий"]],
+  ["couchgrass-root", "Корінь пирію", "root", "кореневище", "rhizome", 44, "m", ["пирій", "пырей"]],
+  ["potentilla-root", "Корінь перстачу (калган)", "root", "кореневище", "rhizome", 18, "m", ["калган", "перстач", "лапчатка прямостояча"]],
+  ["marshmallow-root", "Корінь алтеї", "root", "корінь", "root", 38, "m", ["алтея", "алтей"]],
+  ["licorice-root", "Корінь солодки", "root", "корінь", "rhizome", 40, "m", ["солодка", "лакриця", "солодковий корінь"]],
+  // Листя
+  ["nettle-leaf", "Листя кропиви", "leaf", "лист", "leaf", 128, "n", ["кропива", "жалива"], [28, 42]],
+  ["mint", "М'ята перцева", "leaf", "лист", "leaf", 152, "f", ["мята", "мятка"], [60, 85]],
+  ["melissa", "Меліса лікарська", "leaf", "лист", "leaf", 110, "f", ["меліса", "мелиса", "лимонна мята"]],
+  ["raspberry-leaf", "Листя малини", "leaf", "лист", "leaf", 120, "n", ["малина"]],
+  ["currant-leaf", "Листя смородини", "leaf", "лист", "leaf", 115, "n", ["смородина"]],
+  ["blackberry-leaf", "Листя ожини", "leaf", "лист", "leaf", 118, "n", ["ожина", "ежевика"]],
+  ["coltsfoot", "Лист мати-й-мачухи", "leaf", "лист", "leaf", 100, "m", ["мати й мачуха", "мать и мачеха"]],
+  ["plantain", "Лист подорожника", "leaf", "лист", "leaf", 105, "m", ["подорожник"]],
+  ["birch-leaf", "Березове листя", "leaf", "лист", "leaf", 90, "n", ["береза"]],
+  ["lingonberry-leaf", "Листя брусниці", "leaf", "лист", "leaf", 135, "n", ["брусниця", "брусника"]],
+  ["bilberry-leaf", "Листя чорниці", "leaf", "лист", "leaf", 140, "n", ["чорниця", "черника"]],
+  ["sage", "Шавлія лікарська", "leaf", "лист", "leaf", 160, "f", ["шавлія", "шалфей"]],
+  ["ash-leaf", "Лист ясена", "leaf", "лист", "leaf", 100, "m", ["ясен"]],
+  ["walnut-leaf", "Листя волоського горіха", "leaf", "лист", "leaf", 95, "n", ["горіх", "орех"]],
+  // Квіти
+  ["linden", "Липовий цвіт", "flower", "суцвіття", "flower", 52, "m", ["липа", "липа цвіт"], [140, 210]],
+  ["chamomile", "Ромашка лікарська", "flower", "квітки", "daisy", 46, "f", ["ромашка аптечна", "ромашка"], [55, 80]],
+  ["elderflower", "Цвіт бузини", "flower", "суцвіття", "umbel", 70, "m", ["бузина", "бузина чорна"], [110, 160]],
+  ["calendula", "Цвіт нагідок (календули)", "flower", "квітки", "daisy", 30, "m", ["нагідки", "календула", "ноготки"]],
+  ["dandelion-flower", "Цвіт кульбаби", "flower", "квітки", "daisy", 50, "m", ["кульбаба", "одуванчик"]],
+  ["clover", "Цвіт конюшини", "flower", "суцвіття", "flower", 320, "m", ["конюшина", "клевер", "конюшина лучна"]],
+  ["hawthorn-flower", "Цвіт глоду", "flower", "суцвіття", "umbel", 80, "m", ["глід", "боярышник"]],
+  ["bird-cherry-flower", "Цвіт черемхи", "flower", "суцвіття", "umbel", 75, "m", ["черемха", "черемуха"]],
+  ["primrose", "Первоцвіт", "flower", "квітки", "flower", 55, "m", ["первоцвет", "баранчики"]],
+  ["violet", "Фіалка запашна", "flower", "квітки", "flower", 270, "f", ["фіалка", "фиалка"]],
+  ["tansy", "Цвіт пижма", "flower", "суцвіття", "daisy", 50, "m", ["пижмо", "пижма"]],
+  ["immortelle", "Цвіт цмину (безсмертник)", "flower", "суцвіття", "flower", 48, "m", ["цмин", "безсмертник", "бессмертник"]],
+  ["cornflower", "Цвіт волошки", "flower", "квітки", "flower", 225, "m", ["волошка", "василек"]],
+  ["lavender", "Лаванда", "flower", "квітки", "flower", 270, "f", ["лаванда"]],
+  ["peony-petals", "Пелюстки півонії", "flower", "пелюстки", "flower", 340, "p", ["півонія", "пион", "піон"]],
+  ["rose-petals", "Пелюстки троянди", "flower", "пелюстки", "flower", 350, "p", ["троянда", "роза", "чайна троянда"]],
+  ["echinacea", "Ехінацея", "flower", "квітки", "daisy", 320, "f", ["ехінацея", "эхинацея"]],
+  // Трава
+  ["hypericum", "Звіробій", "herb", "трава", "flower", 42, "m", ["заяча кров", "звіробой", "зверобой"], [40, 60]],
+  ["yarrow", "Деревій", "herb", "трава", "umbel", 96, "m", ["тисячолистник", "кривавник"], [30, 45]],
+  ["thyme", "Чебрець", "herb", "трава", "flower", 290, "m", ["чабрець", "тимьян", "чабрец"]],
+  ["oregano", "Материнка", "herb", "трава", "flower", 300, "f", ["душиця", "душица"]],
+  ["wormwood", "Полин гіркий", "herb", "трава", "leaf", 90, "m", ["полин", "полынь"]],
+  ["horsetail", "Хвощ польовий", "herb", "трава", "leaf", 110, "m", ["хвощ"]],
+  ["celandine", "Чистотіл", "herb", "трава", "flower", 60, "m", ["чистотел"]],
+  ["bidens", "Череда", "herb", "трава", "leaf", 70, "f", ["череда"]],
+  ["motherwort", "Собача кропива (пустирник)", "herb", "трава", "leaf", 120, "f", ["пустирник", "пустырник"]],
+  ["knotweed", "Споріш", "herb", "трава", "leaf", 100, "m", ["спорыш", "гірчак пташиний"]],
+  ["goldenrod", "Золотарник", "herb", "трава", "flower", 52, "m", ["золотая розга"]],
+  ["lungwort", "Медунка лікарська", "herb", "трава", "flower", 260, "f", ["медунка"]],
+  ["silverweed", "Перстач гусячий (лапчатка)", "herb", "трава", "leaf", 95, "m", ["лапчатка гусяча", "перетач"]],
+  ["ground-ivy", "Будра плющовидна", "herb", "трава", "leaf", 140, "f", ["будра"]],
+  ["melilot", "Буркун", "herb", "трава", "flower", 55, "m", ["донник"]],
+  ["willowherb", "Іван-чай (кипрей)", "herb", "трава", "flower", 320, "m", ["кипрей", "іван чай", "иван чай"]],
+  ["deadnettle", "Яснотка пурпурова", "herb", "трава", "flower", 320, "f", ["яснотка", "глуха кропива"]],
+  ["strawberry-herb", "Суниця лісова (трава)", "herb", "трава", "leaf", 125, "f", ["суниця", "земляника"]],
+  ["corn-silk", "Кукурудзяні рильця", "herb", "рильця", "umbel", 45, "p", ["кукурудза", "рильця", "кукурузные рыльца"]],
+  ["hops", "Шишки хмелю", "herb", "шишки", "umbel", 80, "p", ["хміль", "хмель"]],
+  // Плоди і ягоди
+  ["rosehip", "Шипшина", "fruit", "плоди", "berry", 12, "f", ["дика рожа", "собача рожа", "шиповник"], [45, 65]],
+  ["cranberry", "Журавлина", "fruit", "ягоди", "berry", 350, "f", ["клюква"]],
+  ["elderberry", "Ягоди бузини", "fruit", "ягоди", "berry", 280, "p", ["бузина", "бузина ягода"]],
+  ["hawthorn-berry", "Плоди глоду", "fruit", "плоди", "berry", 8, "p", ["глід", "боярышник"]],
+  ["rowan", "Горобина", "fruit", "ягоди", "berry", 18, "f", ["рябина"]],
+  ["sea-buckthorn", "Обліпиха", "fruit", "ягоди", "berry", 32, "f", ["облепиха"]],
+  ["viburnum", "Калина", "fruit", "ягоди", "berry", 2, "f", ["калина"]],
+  ["blackthorn", "Терен", "fruit", "плоди", "berry", 260, "m", ["терн", "тернослив"]],
+  ["bilberry", "Чорниця", "fruit", "ягоди", "berry", 245, "f", ["черника"]],
+  ["lingonberry", "Брусниця", "fruit", "ягоди", "berry", 355, "f", ["брусника"]],
+  ["cherry-dried", "Вишня сушена", "fruit", "плоди", "berry", 345, "f", ["вишня"]],
+  ["aronia", "Аронія (чорноплідна горобина)", "fruit", "ягоди", "berry", 270, "f", ["аронія", "черноплодка"]],
+  ["juniper", "Ягоди ялівцю", "fruit", "ягоди", "berry", 230, "p", ["ялівець", "можжевельник"]],
+  ["horse-chestnut", "Каштан кінський", "fruit", "плоди", "seed", 25, "m", ["каштан"]],
+  // Насіння
+  ["milk-thistle", "Насіння розторопші", "seed", "насіння", "seed", 30, "n", ["розторопша", "чортополох"], [45, 70]],
+  ["flax-seed", "Насіння льону", "seed", "насіння", "seed", 35, "n", ["льон", "лен"]],
+  ["dill-seed", "Насіння кропу", "seed", "насіння", "seed", 60, "n", ["кріп", "укроп"]],
+  ["caraway", "Кмин", "seed", "насіння", "seed", 40, "m", ["тмин"]],
+  // Кора, бруньки
+  ["oak-bark", "Кора дуба", "bark", "кора", "rhizome", 25, "f", ["дуб"]],
+  ["buckthorn-bark", "Кора крушини", "bark", "кора", "rhizome", 20, "f", ["крушина"]],
+  ["willow-bark", "Кора верби", "bark", "кора", "rhizome", 30, "f", ["верба", "ива"]],
+  ["viburnum-bark", "Кора калини", "bark", "кора", "rhizome", 15, "f", ["калина"]],
+  ["birch-buds", "Березові бруньки", "bark", "бруньки", "seed", 90, "p", ["береза", "бруньки"]],
+  ["pine-buds", "Соснові бруньки", "bark", "бруньки", "seed", 110, "p", ["сосна", "бруньки"]],
+  // «Інша рослина» — коли потрібної нема в списку: людина пише назву сама
+  ["other", "Інша рослина", "herb", "сировина", "leaf", 120, "f", []],
 ];
 
-/** «сухий / суха / сухе» — у роді назви рослини */
-export const dryWord = (h: Herb) => ({ m: "сухий", f: "суха", n: "сухе" })[h.gender];
+export const herbs: Herb[] = rows.map(([id, name, category, part, art, hue, gender, aliases, priceHint]) => ({ id, name, category, part, art, hue, gender, aliases, priceHint }));
+
+export const OTHER = "other";
+
+/** «сухий / суха / сухе / сухі» — у роді назви рослини */
+export const dryWord = (h: Herb) => ({ m: "сухий", f: "суха", n: "сухе", p: "сухі" })[h.gender];
 
 export const herbById = (id: string): Herb => {
   const h = herbs.find((x) => x.id === id);
   if (!h) throw new Error(`Невідома сировина: ${id}`);
   return h;
 };
-
-export const monthNames = [
-  "січень", "лютий", "березень", "квітень", "травень", "червень",
-  "липень", "серпень", "вересень", "жовтень", "листопад", "грудень",
-];
-
-export const monthNamesLoc = [
-  "січні", "лютому", "березні", "квітні", "травні", "червні",
-  "липні", "серпні", "вересні", "жовтні", "листопаді", "грудні",
-];
