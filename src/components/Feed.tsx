@@ -8,6 +8,7 @@ import { categories, herbById, type CategoryId } from "@/data/herbs";
 import { listings } from "@/data/listings";
 import { regions } from "@/data/regions";
 import { matchHerbs, norm } from "@/lib/search";
+import { itemName, minPrice } from "@/lib/items";
 
 type Sort = "new" | "cheap" | "expensive";
 
@@ -17,25 +18,27 @@ export function Feed() {
   const [cat, setCat] = useState<CategoryId | null>(null);
   const [region, setRegion] = useState("");
   const [sort, setSort] = useState<Sort>("new");
+  const [onlyNp, setOnlyNp] = useState(false);
   const [sheet, setSheet] = useState(false);
 
   const shown = useMemo(() => {
     const needle = norm(q);
     const herbIds = new Set(matchHerbs(q).map((h) => h.id));
     const out = listings.filter((l) => {
-      const herb = herbById(l.herbId);
+      const herbs = l.items.map((i) => herbById(i.herbId));
       return l.kind === kind
-        && (!cat || herb.category === cat)
+        && (!cat || herbs.some((h) => h.category === cat))
         && (!region || l.region === region)
-        && (!needle || herbIds.has(l.herbId) || norm(l.note).includes(needle));
+        && (!onlyNp || l.delivery.np)
+        && (!needle || l.items.some((i) => herbIds.has(i.herbId) || norm(itemName(i)).includes(needle)) || norm(l.note).includes(needle));
     });
-    if (sort === "cheap") out.sort((a, b) => a.price - b.price);
-    if (sort === "expensive") out.sort((a, b) => b.price - a.price);
+    if (sort === "cheap") out.sort((a, b) => minPrice(a) - minPrice(b));
+    if (sort === "expensive") out.sort((a, b) => { const x = minPrice(a), y = minPrice(b); return (y === Infinity ? -1 : y) - (x === Infinity ? -1 : x); });
     return out;
-  }, [kind, q, cat, region, sort]);
+  }, [kind, q, cat, region, sort, onlyNp]);
 
-  const filtersOn = (region ? 1 : 0) + (sort !== "new" ? 1 : 0);
-  const reset = () => { setQ(""); setCat(null); setRegion(""); setSort("new"); };
+  const filtersOn = (region ? 1 : 0) + (sort !== "new" ? 1 : 0) + (onlyNp ? 1 : 0);
+  const reset = () => { setQ(""); setCat(null); setRegion(""); setSort("new"); setOnlyNp(false); };
 
   return (
     <section className="mx-auto max-w-5xl px-4">
@@ -107,8 +110,12 @@ export function Feed() {
                   className={`h-11 rounded-xl border text-[14px] font-medium ${sort === v ? "border-accent bg-accent-soft text-accent" : "border-line"}`}>{t}</button>
               ))}
             </div>
+            <label className="mt-4 flex h-12 items-center justify-between rounded-xl border border-line px-3 text-[15px] font-medium">
+              Відправка Новою поштою
+              <input type="checkbox" checked={onlyNp} onChange={(e) => setOnlyNp(e.target.checked)} className="h-5 w-5 accent-[var(--accent)]" />
+            </label>
             <div className="mt-6 grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => { setRegion(""); setSort("new"); }} className="h-12 rounded-xl border border-line font-semibold">Скинути</button>
+              <button type="button" onClick={() => { setRegion(""); setSort("new"); setOnlyNp(false); }} className="h-12 rounded-xl border border-line font-semibold">Скинути</button>
               <button type="button" onClick={() => setSheet(false)} className="h-12 rounded-xl bg-accent font-semibold text-on-accent">Показати {shown.length}</button>
             </div>
           </div>

@@ -1,13 +1,12 @@
-// Сторінка одного оголошення.
+// Сторінка одного оголошення: ціна (або прайс-лист), контакти, умови, опис.
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HerbArt } from "@/components/HerbArt";
-import { CallButton } from "@/components/CallButton";
+import { ContactButtons } from "@/components/ContactButtons";
 import { Icon } from "@/components/Icon";
-import { herbById } from "@/data/herbs";
 import { listingById, listings } from "@/data/listings";
-import { kg, uah } from "@/lib/format";
+import { deliveryText, isList, itemName, listingTitle, priceText, tradeText, whereText } from "@/lib/items";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => listings.map((l) => ({ id: l.id }));
@@ -16,27 +15,28 @@ type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const l = listingById((await params).id);
-  if (!l) return { title: "Оголошення" };
-  const herb = herbById(l.herbId);
-  return { title: `${l.kind === "buy" ? "Куплю" : "Продам"}: ${herb.name} — ${l.price} грн/кг` };
+  return { title: l ? `${l.kind === "buy" ? "Куплю" : "Продам"}: ${l.items.map(itemName).slice(0, 3).join(", ")}` : "Оголошення" };
 }
 
 export default async function ListingPage({ params }: Props) {
   const l = listingById((await params).id);
   if (!l) notFound();
-  const herb = herbById(l.herbId);
   const buy = l.kind === "buy";
+  const list = isList(l);
+  const first = l.items[0];
   const facts: [string, string][] = [
-    [buy ? "Потрібно" : "Є в наявності", kg(l.volumeKg)],
+    ...(l.volume ? [[buy ? "Потрібно" : "Є в наявності", l.volume] as [string, string]] : []),
     ["Стан", l.condition],
-    ["Рік збору", String(l.year)],
-    ["Частина рослини", herb.part],
-    ["Де", `${l.place}, ${l.region} обл.`],
+    ...(l.year ? [["Рік збору", String(l.year)] as [string, string]] : []),
+    ...(l.clean ? [["Чистота", "Чисто, без домішок"] as [string, string]] : []),
+    [buy ? "Купую" : "Продаю", tradeText[l.trade]],
+    ["Доставка", deliveryText(l.delivery)],
+    ["Де", whereText(l)],
   ];
   return (
     <div className="mx-auto max-w-2xl">
       <div className="relative">
-        <HerbArt herbId={l.herbId} className="aspect-[4/3] w-full md:mt-4 md:rounded-3xl" />
+        <HerbArt herbId={first.herbId} className="aspect-[4/3] w-full md:mt-4 md:rounded-3xl" />
         <Link href="/" aria-label="Назад" className="pressable absolute left-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-surface/90 shadow-card">
           <Icon name="back" size={20} strokeWidth={2.2} />
         </Link>
@@ -45,11 +45,24 @@ export default async function ListingPage({ params }: Props) {
         <span className={`inline-block rounded-full px-2.5 py-1 text-[12px] font-semibold ${buy ? "bg-orange-soft text-orange" : "bg-accent-soft text-accent"}`}>
           {buy ? "Куплю" : "Продам"}
         </span>
-        <h1 className="mt-2 text-[24px] font-bold leading-tight">{herb.name}</h1>
-        <p className={`mt-1 text-[26px] font-bold ${buy ? "text-orange" : "text-accent"}`}>
-          {buy && <span className="text-[16px] font-medium">до </span>}{uah(l.price)}<span className="text-[16px] font-medium text-muted"> / кг</span>
-        </p>
-        <div className="mt-4"><CallButton kind={l.kind} big /></div>
+        <h1 className="mt-2 text-[24px] font-bold leading-tight">{listingTitle(l)}</h1>
+        {!list && (
+          <p className={`mt-1 text-[26px] font-bold ${buy ? "text-orange" : "text-accent"}`}>
+            {buy && first.price != null && <span className="text-[16px] font-medium">до </span>}{priceText(first)}
+          </p>
+        )}
+        {list && (
+          <ul className="mt-3 divide-y divide-line rounded-2xl border border-line bg-surface">
+            {l.items.map((i, k) => (
+              <li key={k} className="flex items-center gap-3 px-3 py-2.5">
+                <HerbArt herbId={i.herbId} className="h-10 w-10 shrink-0 rounded-lg" />
+                <span className="min-w-0 flex-1 truncate font-medium">{itemName(i)}</span>
+                <span className={`shrink-0 font-bold ${buy ? "text-orange" : "text-accent"}`}>{priceText(i)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="mt-4"><ContactButtons l={l} full /></div>
         <dl className="mt-5 divide-y divide-line rounded-2xl border border-line bg-surface">
           {facts.map(([k, v]) => (
             <div key={k} className="flex justify-between gap-4 px-4 py-3 text-[15px]">
