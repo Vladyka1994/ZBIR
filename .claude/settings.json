@@ -1,0 +1,68 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node*)",
+      "Bash(npm run*)",
+      "Bash(npm test*)",
+      "Bash(npx*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git fetch*)",
+      "Bash(git pull*)",
+      "Bash(git branch*)",
+      "Bash(git checkout*)",
+      "Bash(git merge origin/main*)",
+      "Bash(git tag*)",
+      "Bash(date*)",
+      "Bash(wc*)",
+      "Bash(ls*)",
+      "Bash(mkdir*)",
+      "Bash(cat*)",
+      "Bash(echo*)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push origin +*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git branch -D*)",
+      "Bash(git checkout -- .*)",
+      "Bash(rm -rf*)",
+      "Bash(rm -fr*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      { "matcher": "startup|resume",
+        "hooks": [ { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-git-sync.sh\"" } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/context-warning.sh\"" } ] }
+    ],
+    "PreToolUse": [
+      { "matcher": "Edit",
+        "hooks": [ { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-edit-read-check.js\"" } ] },
+      { "matcher": "Bash",
+        "hooks": [ { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/byyou-push-lock.js\"" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-check.sh\"" },
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/version-reminder.sh\"" }
+        ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/byyou-context-guard.sh\"" } ] }
+    ]
+  },
+  "env": {
+    "CONTEXT_LIMIT": "200000",
+    "DOCS_DIR": "docs"
+  }
+}

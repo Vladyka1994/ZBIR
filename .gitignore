@@ -1,0 +1,7 @@
+.claude/.byyou-*
+.claude/.token-halt
+.claude/.byyou-release
+.claude/hooks/.byyou-handoff-warned
+node_modules/
+.env
+.env.*
